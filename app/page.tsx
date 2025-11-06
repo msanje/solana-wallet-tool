@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { del } from "idb-keyval";
 import WalletCard from "./components/WalletCard";
 import Image from "next/image";
-import { Trash2 } from "lucide-react";
+import { Github, Trash2 } from "lucide-react";
 
 export default function Home() {
   const connection = new Connection("http://localhost:8899");
@@ -47,7 +47,8 @@ export default function Home() {
   };
 
   const handleDeleteAll = async () => {
-    del("wallets");
+    await del("wallets");
+    setWallets([]);
   };
 
   const handleDelete = async (id: string) => {
@@ -57,17 +58,29 @@ export default function Home() {
   return (
     <div>
       <div>
-        <div className="flex flex-row justify-center">
-          <Image
-            src={"./solanaLogo.svg"}
-            width={200}
-            height={200}
-            alt="solana logo"
-            className="mr-4"
-          />
-          <h1 className="text-4xl font-bold flex justify-center my-4 font-sans text-#FFFFFF">
-            Wallet Tool
-          </h1>
+        <div className="flex flex-row justify-between mx-12">
+          <div className="flex flex-row">
+            <Image
+              src={"./solanaLogo.svg"}
+              width={200}
+              height={200}
+              alt="solana logo"
+              className="mr-4"
+            />
+            <h1 className="text-4xl font-bold flex justify-center my-4 font-sans text-white">
+              Wallet Tool
+            </h1>
+          </div>
+
+          <div className="flex flex-row p-4 mt-2">
+            <a
+              className="flex flex-row"
+              href="https://github.com/msanje/solana-wallet-tool"
+            >
+              <Github />
+              <span className="ml-1">Github</span>
+            </a>
+          </div>
         </div>
         <p className="flex justify-center">
           Create as many ephemeral wallets as you want and persist their data on
@@ -103,7 +116,7 @@ export default function Home() {
         {/* <p>Click on the button below.</p> */}
       </div>
       <div className="w-full">
-        <div className="flex justify-between mb-8 w-96 mx-auto">
+        <div className="flex justify-center mb-8 w-96 mx-auto">
           {connected && (
             <button
               className="cursor-pointer text-xl font-bold bg-blue-500 w-38 h-12 rounded-md"
@@ -113,18 +126,24 @@ export default function Home() {
               Create Wallet
             </button>
           )}
+        </div>
+      </div>
+      <div>
+        <div className="flex flex-row justify-between items-center mb-4 mx-12 px-2">
+          <span className="text-gray-400">
+            Number of wallets: {wallets?.length}
+          </span>
 
           {wallets !== undefined && wallets?.length > 0 && (
             <button
-              className="cursor-pointer text-xl font-bold bg-red-500 w-38 h-12 rounded-md"
+              // className="cursor-pointer text-sm font-bold bg-red-500 w-24 h-10 rounded-md"
+              className="cursor-pointer text-sm font-bold bg-red-500 px-4 py-2 rounded-md"
               onClick={handleDeleteAll}
             >
               Delete All
             </button>
           )}
         </div>
-      </div>
-      <div>
         {wallets != null &&
           wallets.map((wallet: Wallet) => (
             <div key={wallet.id}>

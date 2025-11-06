@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { connection, deleteWalletById, Wallet } from "../_lib/walletStore";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import { Coins, DollarSign, Trash2, X } from "lucide-react";
+import { Coins, DollarSign, Trash2, Trash2Icon, X } from "lucide-react";
 
 export default function WalletCard({
   wallet,
@@ -13,7 +13,15 @@ export default function WalletCard({
   const [balance, setBalance] = useState(0);
   const [airdropping, setAirdropping] = useState(false);
   const [sol, setSol] = useState(1);
-  const presets = [0.5, 1, 2.5, 5];
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (copied) {
+      setTimeout(() => {
+        setCopied(false);
+      }, 1500);
+    }
+  }, [copied]);
 
   const handleAirdrop = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +72,7 @@ export default function WalletCard({
   const handleCopy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
+      setCopied(true);
       console.log("copied: ", text);
     } catch (error) {
       console.error("copy failed: ", error);
@@ -75,25 +84,37 @@ export default function WalletCard({
       key={wallet.id}
       className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm mx-12"
     >
-      <button
-        onClick={() => handleDelete()}
-        className="flex justify-end w-full cursor-pointer text-gray-500"
-      >
-        <X />
-      </button>
+      <div className="w-full flex justify-end">
+        <button
+          onClick={() => handleDelete()}
+          className="group flex justify-end cursor-pointer text-gray-500"
+        >
+          <Trash2Icon />
+          {/* <X />
+          <span className="ml-2 hidden group-hover:inline text-sm text-gray-500">
+            Delete
+          </span> */}
+        </button>
+      </div>
       <div className="px-4 pb-2">
         <p className="text-sm font-semibold text-gray-700">{wallet.label}</p>
         <div className="mt-2 space-y-1 text-xs text-gray-600">
           <p>
             <span className="font-medium ">Public: </span>
             <span
-              className="font-mono
+              className="font-mono break-all
           hover:bg-blue-200 cursor-pointer
           "
               onClick={() => handleCopy(wallet.pub)}
             >
               {wallet.pub}
             </span>
+            {copied && (
+              // <span className="absolute -top-5 left-0 text-9xl text-red-500">
+              <span className="fixed inset-0 flex items-center justify-center text-3xl text-green-500 bg-black bg-opacity-50 z-50">
+                Copied!
+              </span>
+            )}
           </p>
           <a
             href={`https://explorer.solana.com/address/${wallet.pub}?cluster=custom&customUrl=http://localhost:8899`}
@@ -106,7 +127,7 @@ export default function WalletCard({
           <p>
             <span className="font-medium">Secret: </span>
             <span
-              className="font-mono
+              className="font-mono break-all
           hover:bg-blue-200 cursor-pointer 
           "
               onClick={() => handleCopy(String(wallet.secret))}
