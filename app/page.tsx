@@ -1,65 +1,107 @@
-import Image from "next/image";
+"use client";
+import { Connection, Keypair } from "@solana/web3.js";
+import { saveWallet, loadWallets, Wallet } from "./_lib/walletStore";
+import { useEffect, useState } from "react";
+import { del } from "idb-keyval";
+import WalletCard from "./components/WalletCard";
 
 export default function Home() {
+  const connection = new Connection("http://localhost:8899");
+  const [connected, setConnected] = useState<boolean>(false);
+  const [wallets, setWallets] = useState<Wallet[] | undefined>(undefined);
+
+  // Load wallets on mount
+  useEffect(() => {
+    const fetchWallets = async () => {
+      const all = await loadWallets();
+      setWallets(all);
+    };
+
+    fetchWallets();
+  }, [wallets]);
+
+  async function checkConnection() {
+    try {
+      const version = await connection.getVersion();
+      console.log("Connected to Solana localnet: ", version);
+      setConnected(true);
+    } catch (error) {
+      console.error("Connection failed: ", error);
+    }
+  }
+
+  const handleSubmit = async () => {
+    const wallet = Keypair.generate();
+
+    console.log(wallet.publicKey.toBase58());
+    console.log(Array.from(wallet.secretKey));
+
+    const kp = Keypair.generate();
+    await saveWallet("Test A", kp.publicKey.toBase58(), kp.secretKey);
+    const all = await loadWallets();
+    setWallets(all);
+
+    console.log("all: ", all);
+  };
+
+  const handleDeleteAll = async () => {
+    del("wallets");
+  };
+
+  const handleDelete = async (id: string) => {
+    setWallets((prev) => (prev ? prev.filter((w) => w.id !== id) : []));
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div>
+      <div>
+        <h1 className="text-5xl font-bold flex justify-center my-4">
+          Solana Wallet Tool
+        </h1>
+        <p className="flex justify-center">
+          Create as many wallets as you want and persist their data on your
+          local machine.
+        </p>
+      </div>
+      <div className="flex flex-col items-center my-4">
+        <h2 className="my-2">Start your localnet with this command: </h2>
+        <p className="my-2">solana-test-validator</p>
+        <p>
+          Once it&apos;s running you can create as many wallets as you want.
+        </p>
+        <h3 className="text-3xl font-bold mt-4">Test Connection</h3>
+        <button
+          onClick={checkConnection}
+          className="w-38 h-10 text-xl my-4 bg-orange-300 rounded-md cursor-pointer font-bold"
+        >
+          Test
+        </button>
+        {/* <p>Click on the button below.</p> */}
+      </div>
+      <div className="flex justify-center mt-48">
+        <button
+          className="cursor-pointer text-xl font-bold bg-blue-500 w-38 h-12 rounded-md"
+          onClick={handleSubmit}
+          disabled={!connected}
+        >
+          {connected ? "Create Wallet" : "Run Validator"}
+        </button>
+
+        <button
+          className="cursor-pointer text-xl font-bold bg-red-500 w-38 h-12 rounded-md"
+          onClick={handleDeleteAll}
+        >
+          Delete all
+        </button>
+      </div>
+      <div>
+        {wallets != null &&
+          wallets.map((wallet: Wallet) => (
+            <div key={wallet.id}>
+              <WalletCard wallet={wallet} onDelete={handleDelete} />
+            </div>
+          ))}
+      </div>
     </div>
   );
 }
