@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { connection, deleteWalletById, Wallet } from "../_lib/walletStore";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import { Coins, DollarSign, Trash2, X } from "lucide-react";
 
 export default function WalletCard({
   wallet,
@@ -72,16 +73,15 @@ export default function WalletCard({
   return (
     <div
       key={wallet.id}
-      className="mb-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+      className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm mx-12"
     >
       <button
         onClick={() => handleDelete()}
-        className="flex justify-end w-full cursor-pointer text-black
-                "
+        className="flex justify-end w-full cursor-pointer text-gray-500"
       >
-        X
+        <X />
       </button>
-      <div>
+      <div className="px-4 pb-2">
         <p className="text-sm font-semibold text-gray-700">{wallet.label}</p>
         <div className="mt-2 space-y-1 text-xs text-gray-600">
           <p>
@@ -95,6 +95,14 @@ export default function WalletCard({
               {wallet.pub}
             </span>
           </p>
+          <a
+            href={`https://explorer.solana.com/address/${wallet.pub}?cluster=custom&customUrl=http://localhost:8899`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono hover:bg-blue-200 cursor-pointer"
+          >
+            Solana Explorer
+          </a>
           <p>
             <span className="font-medium">Secret: </span>
             <span
@@ -112,37 +120,27 @@ export default function WalletCard({
               {wallet.id}
             </span>
           </p>
-
           <div className="flex flex-row">
             <h3 className="text-xl font-bold mr-4">Balance: </h3>
             <p className="text-xl">{balance}</p>
           </div>
-
           <form className="flex flex-row">
             <button
               onClick={handleAirdrop}
               disabled={airdropping}
-              className={`text-white h-12 w-full rounded-md text-xl font-bold  ${
+              className={`text-white flex flex-row justify-center items-center h-12 w-full rounded-md text-xl font-bold  ${
                 airdropping ? "bg-gray-400" : "bg-black cursor-pointer"
               }`}
             >
-              {airdropping ? "Airdropping...." : `Confirm Airdrop ${sol}`}
+              {airdropping ? (
+                "Airdropping...."
+              ) : (
+                <>
+                  <Coins />
+                  <span className="ml-2">Confirm Airdrop ${sol}</span>
+                </>
+              )}
             </button>
-            {/* <div ml-4 grid grid-cols-2 gap-2>
-              {presets.map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => setSol(v)}
-                  className={`rounded-md px-3 py-2 text-sm font-semibold ${
-                    sol === v ? "bg-black text-white" : "bg-gray-200 text-black"
-                  }`}
-                >
-                  {v}
-                </button>
-              ))}
-            </div> */}
-
             <input
               type="number"
               min={1}

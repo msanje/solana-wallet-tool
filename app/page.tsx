@@ -4,6 +4,8 @@ import { saveWallet, loadWallets, Wallet } from "./_lib/walletStore";
 import { useEffect, useState } from "react";
 import { del } from "idb-keyval";
 import WalletCard from "./components/WalletCard";
+import Image from "next/image";
+import { Trash2 } from "lucide-react";
 
 export default function Home() {
   const connection = new Connection("http://localhost:8899");
@@ -55,17 +57,39 @@ export default function Home() {
   return (
     <div>
       <div>
-        <h1 className="text-5xl font-bold flex justify-center my-4">
-          Solana Wallet Tool
-        </h1>
+        <div className="flex flex-row justify-center">
+          <Image
+            src={"./solanaLogo.svg"}
+            width={200}
+            height={200}
+            alt="solana logo"
+            className="mr-4"
+          />
+          <h1 className="text-4xl font-bold flex justify-center my-4 font-sans text-#FFFFFF">
+            Wallet Tool
+          </h1>
+        </div>
         <p className="flex justify-center">
-          Create as many wallets as you want and persist their data on your
-          local machine.
+          Create as many ephemeral wallets as you want and persist their data on
+          your local machine.
         </p>
       </div>
       <div className="flex flex-col items-center my-4">
-        <h2 className="my-2">Start your localnet with this command: </h2>
+        <h2 className="my-2">
+          Start your localnet with this command on your terminal:{" "}
+        </h2>
         <p className="my-2">solana-test-validator</p>
+        <div className="flex flex-row items-center gap-x-2">
+          <p>For more info </p>
+          <a
+            className="text-blue-300 hover:text-blue-600 hover:underline"
+            href="http://solana.com/developers/guides/getstarted/solana-test-validator"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Click here.
+          </a>
+        </div>
         <p>
           Once it&apos;s running you can create as many wallets as you want.
         </p>
@@ -78,25 +102,27 @@ export default function Home() {
         </button>
         {/* <p>Click on the button below.</p> */}
       </div>
-      <div className="flex justify-center mt-48">
-        {connected && (
-          <button
-            className="cursor-pointer text-xl font-bold bg-blue-500 w-38 h-12 rounded-md"
-            onClick={handleSubmit}
-            disabled={!connected}
-          >
-            Create Wallet
-          </button>
-        )}
+      <div className="w-full">
+        <div className="flex justify-between mb-8 w-96 mx-auto">
+          {connected && (
+            <button
+              className="cursor-pointer text-xl font-bold bg-blue-500 w-38 h-12 rounded-md"
+              onClick={handleSubmit}
+              disabled={!connected}
+            >
+              Create Wallet
+            </button>
+          )}
 
-        {wallets !== undefined && wallets?.length > 0 && (
-          <button
-            className="cursor-pointer text-xl font-bold bg-red-500 w-38 h-12 rounded-md"
-            onClick={handleDeleteAll}
-          >
-            Delete all
-          </button>
-        )}
+          {wallets !== undefined && wallets?.length > 0 && (
+            <button
+              className="cursor-pointer text-xl font-bold bg-red-500 w-38 h-12 rounded-md"
+              onClick={handleDeleteAll}
+            >
+              Delete All
+            </button>
+          )}
+        </div>
       </div>
       <div>
         {wallets != null &&
