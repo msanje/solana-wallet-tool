@@ -1,11 +1,14 @@
 "use client";
+import { Connection } from "@solana/web3.js";
 import { set, get, update } from "idb-keyval";
+
+export const connection = new Connection("http://localhost:8899");
 
 export type Wallet = {
   id: string;
   label: string;
   pub: string;
-  secrete: number[];
+  secret: number[];
 };
 
 export async function deleteWalletById(id: string) {
@@ -18,11 +21,11 @@ export async function deleteWalletById(id: string) {
 export async function saveWallet(
   label: string,
   pub: string,
-  secrete: Uint8Array
+  secret: Uint8Array
 ) {
   await update("wallets", (arr: Wallet[] = []) => [
     ...arr,
-    { id: crypto.randomUUID(), label, pub, secrete: Array.from(secrete) },
+    { id: crypto.randomUUID(), label, pub, secret: Array.from(secret) },
   ]);
 }
 
