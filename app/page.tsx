@@ -69,30 +69,34 @@ export default function Home() {
         <p>
           Once it&apos;s running you can create as many wallets as you want.
         </p>
-        <h3 className="text-3xl font-bold mt-4">Test Connection</h3>
+        <h3 className="text-3xl font-bold mt-4">Connect to local validator</h3>
         <button
           onClick={checkConnection}
           className="w-38 h-10 text-xl my-4 bg-orange-300 rounded-md cursor-pointer font-bold"
         >
-          Test
+          {connected ? "Connected" : "Connect"}
         </button>
         {/* <p>Click on the button below.</p> */}
       </div>
       <div className="flex justify-center mt-48">
-        <button
-          className="cursor-pointer text-xl font-bold bg-blue-500 w-38 h-12 rounded-md"
-          onClick={handleSubmit}
-          disabled={!connected}
-        >
-          {connected ? "Create Wallet" : "Run Validator"}
-        </button>
+        {connected && (
+          <button
+            className="cursor-pointer text-xl font-bold bg-blue-500 w-38 h-12 rounded-md"
+            onClick={handleSubmit}
+            disabled={!connected}
+          >
+            Create Wallet
+          </button>
+        )}
 
-        <button
-          className="cursor-pointer text-xl font-bold bg-red-500 w-38 h-12 rounded-md"
-          onClick={handleDeleteAll}
-        >
-          Delete all
-        </button>
+        {wallets !== undefined && wallets?.length > 0 && (
+          <button
+            className="cursor-pointer text-xl font-bold bg-red-500 w-38 h-12 rounded-md"
+            onClick={handleDeleteAll}
+          >
+            Delete all
+          </button>
+        )}
       </div>
       <div>
         {wallets != null &&

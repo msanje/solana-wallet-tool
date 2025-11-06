@@ -11,13 +11,20 @@ export default function WalletCard({
 }) {
   const [balance, setBalance] = useState(0);
   const [airdropping, setAirdropping] = useState(false);
+  const [sol, setSol] = useState(1);
+  const presets = [0.5, 1, 2.5, 5];
 
-  const handleAirdrop = async () => {
+  const handleAirdrop = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     try {
       setAirdropping(true);
       const pubkey = new PublicKey(wallet.pub);
 
-      const sig = await connection.requestAirdrop(pubkey, 1 * LAMPORTS_PER_SOL);
+      const sig = await connection.requestAirdrop(
+        pubkey,
+        sol * LAMPORTS_PER_SOL
+      );
 
       // confirm
       const { blockhash, lastValidBlockHeight } =
@@ -111,7 +118,7 @@ export default function WalletCard({
             <p className="text-xl">{balance}</p>
           </div>
 
-          <div>
+          <form className="flex flex-row">
             <button
               onClick={handleAirdrop}
               disabled={airdropping}
@@ -119,9 +126,34 @@ export default function WalletCard({
                 airdropping ? "bg-gray-400" : "bg-black cursor-pointer"
               }`}
             >
-              {airdropping ? "Airdropping...." : "Airdrop 1 SOL"}
+              {airdropping ? "Airdropping...." : `Confirm Airdrop ${sol}`}
             </button>
-          </div>
+            {/* <div ml-4 grid grid-cols-2 gap-2>
+              {presets.map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setSol(v)}
+                  className={`rounded-md px-3 py-2 text-sm font-semibold ${
+                    sol === v ? "bg-black text-white" : "bg-gray-200 text-black"
+                  }`}
+                >
+                  {v}
+                </button>
+              ))}
+            </div> */}
+
+            <input
+              type="number"
+              min={1}
+              step={1}
+              max={10}
+              className="rounded-md ml-4 border-2 border-gray-400 w-18 pl-6 text-2xl"
+              placeholder="Amount"
+              value={sol}
+              onChange={(e) => setSol(Number(e.target.value))}
+            />
+          </form>
         </div>
       </div>
     </div>
